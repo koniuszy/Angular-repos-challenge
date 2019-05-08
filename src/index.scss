@@ -1,0 +1,53 @@
+$background-color: #222222;
+
+%no-margin-and-paddings{
+margin: 0;
+padding: 0;
+}
+
+%flex-box{
+  display: flex;
+  flex-wrap: wrap;
+}
+
+body {
+  @extend %no-margin-and-paddings;
+  background-color: $background-color;
+  color: white;
+}
+
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, "Courier New",
+    monospace;
+}
+
+.container {
+  @extend %flex-box;
+  justify-content: center;
+}
+
+.title {
+  border-bottom: 0.5px solid gray;
+  width: 90vw;
+  text-align: center;
+  line-height: 100px;
+}
+
+ul {
+  list-style-type: none;
+  li{
+    width: 75vw;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 0.5px solid #e1e4e8;
+    
+  }
+}
+
+h2 {
+  color: #a0b4c8;
+}
+
+h3 {
+  color: #AEAEAE
+}
