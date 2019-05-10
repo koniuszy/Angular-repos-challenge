@@ -12,7 +12,7 @@ class App extends React.Component {
     errors: 0,
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
-    sortedByGists: false
+    results: []
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
@@ -84,7 +84,6 @@ class App extends React.Component {
       this.state.contributorsLinks.length ===
       this.state.contributors.length + this.state.errors
     ) {
-      let results = []
       let contributorsTab = []
       let checkID = []
 
@@ -104,25 +103,14 @@ class App extends React.Component {
         return 1
       })
 
-      this.setState({
-        contributorsWithoutRepeats: results,
-        isFetched: true
-      })
-
-      contributorsTab.map((el, index) => {
-        this.fetchUserUrl(el.url)
-        results.push(
-          <li key={index}>
-            <h2>{index + 1}</h2>
-            <h2>{el.login}</h2>
-          </li>
-        )
+      contributorsTab.map(el => {
+        this.fetchUserUrl(el.url, contributorsTab.length, contributorsTab)
         return 1
       })
     }
   }
 
-  fetchUserUrl = el => {
+  fetchUserUrl = (el, length, contributorsTab) => {
     fetch(el, {
       method: 'GET',
       headers: {
@@ -131,23 +119,70 @@ class App extends React.Component {
     })
       .then(response => response.json())
       .then(data =>
-        this.setState(prevState => ({
-          contributionsWithDetails: [...prevState.contributionsWithDetails, data]
-        }))
+        this.setState(
+          prevState => ({
+            contributionsWithDetails: [...prevState.contributionsWithDetails, data]
+          }),
+          () => this.allContributorsWithDetails(length, contributorsTab)
+        )
       )
   }
 
-  printRepositories = () => {
-    if (this.state.sortedByGists) {
-      return this.state.sortedByGists
-    } else {
-      return (
-        <>
-          <h2 className="title"> {this.state.contributorsWithoutRepeats.length} users found</h2>{' '}
-          <ul>{this.state.contributorsWithoutRepeats}</ul>
-        </>
-      )
+  allContributorsWithDetails = (length, contributorsTab) => {
+    if (this.state.contributionsWithDetails.length === length) {
+      let contributionsWithRepeats = this.state.contributionsWithDetails
+      contributorsTab.map((el, index) => {
+        contributionsWithRepeats[index].repeats = el.repeats
+        return 1
+      })
+
+      let results = []
+      this.state.contributionsWithDetails.map((el, index) => {
+        results.push(
+          <li key={index}>
+            <h2>{index + 1}</h2>
+            <h2>{el.login}</h2>
+            <h2>public gists: {el.public_gists}</h2>
+            <h2>public repositories: {el.public_repos}</h2>
+            <h2>repositories in Angular: {contributorsTab[index].repeats}</h2>
+          </li>
+        )
+        return 1
+      })
+      this.setState({
+        contributionsWithDetails: contributionsWithRepeats,
+        results: results,
+        isFetched: true
+      })
     }
+  }
+
+  printRepositories = () => {
+    return (
+      <>
+        <h2 className="title"> {this.state.contributionsWithDetails.length} users was found</h2>
+        <ul>{this.state.results}</ul>
+      </>
+    )
+  }
+
+  newResults = (tab, results) => {
+    tab.map((el, index) => {
+      results.push(
+        <li key={index}>
+          <h2>{index + 1}</h2>
+          <h2>{el.login}</h2>
+          <h2>public gists: {el.public_gists}</h2>
+          <h2>public repositories: {el.public_repos}</h2>
+          <h2>followers: {el.followers}</h2>
+          <h2>repositories in Angular: {el.repeats}</h2>
+        </li>
+      )
+      return 1
+    })
+    this.setState({
+      results: results
+    })
   }
 
   filterGists = () => {
@@ -155,24 +190,32 @@ class App extends React.Component {
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.public_gists
     }).reverse()
-
-    tab.map((element, index) => {
-      results.push(
-        <li key={index}>
-          <h2>{index + 1}</h2>
-          <h2>{element.login}</h2>
-        </li>
-      )
-      return 1
-    })
-
-    this.setState({
-      sortedByGists: [<ul key="gists"> {results} </ul>]
-    })
+    this.newResults(tab, results)
   }
-  filterFollowers = () => {}
-  filterRepositories = () => {}
-  filterContributions = () => {}
+
+  filterFollowers = () => {
+    let results = []
+    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
+      return o.followers
+    }).reverse()
+    this.newResults(tab, results)
+  }
+
+  filterRepositories = () => {
+    let results = []
+    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
+      return o.public_repos
+    }).reverse()
+    this.newResults(tab, results)
+  }
+
+  filterContributions = () => {
+    let results = []
+    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
+      return o.repeats
+    }).reverse()
+    this.newResults(tab, results)
+  }
 
   render() {
     return (
