@@ -12,13 +12,14 @@ class App extends React.Component {
     errors: 0,
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
-    results: []
+    results: [],
+    isFiltering: false
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
 
   componentDidMount() {
-    this.fetchRepositories()
+    // this.fetchRepositories()
   }
 
   fetchRepositories = () => {
@@ -166,25 +167,6 @@ class App extends React.Component {
     )
   }
 
-  newResults = (tab, results) => {
-    tab.map((el, index) => {
-      results.push(
-        <li key={index}>
-          <h2>{index + 1}</h2>
-          <h2>{el.login}</h2>
-          <h2>public gists: {el.public_gists}</h2>
-          <h2>public repositories: {el.public_repos}</h2>
-          <h2>followers: {el.followers}</h2>
-          <h2>repositories in Angular: {el.repeats}</h2>
-        </li>
-      )
-      return 1
-    })
-    this.setState({
-      results: results
-    })
-  }
-
   filterGists = () => {
     let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
@@ -217,19 +199,57 @@ class App extends React.Component {
     this.newResults(tab, results)
   }
 
+  newResults = (tab, results) => {
+    tab.map((el, index) => {
+      results.push(
+        <li key={index}>
+          <h2>{index + 1}</h2>
+          <h2>{el.login}</h2>
+          <h2>public gists: {el.public_gists}</h2>
+          <h2>public repositories: {el.public_repos}</h2>
+          <h2>followers: {el.followers}</h2>
+          <h2>repositories in Angular: {el.repeats}</h2>
+        </li>
+      )
+      return 1
+    })
+    this.setState({
+      results: results,
+      isFiltering: true
+    })
+  }
+
+  filterInput = () => {
+    if (this.state.isFiltering) {
+      return (
+        <div className="inputs">
+          from <input min={0} type="number" />
+          to <input min={1} type="number" />
+        </div>
+      )
+    }
+  }
+
   render() {
     return (
       <div className="container">
         <header>
           <h1 className="title">Angular repos</h1>
           <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-            <DropDown.Item onClick={this.filterGists}>gist</DropDown.Item>
-            <DropDown.Item onClick={this.filterFollowers}>followers</DropDown.Item>
-            <DropDown.Item onClick={this.filterRepositories}>public repos</DropDown.Item>
-            <DropDown.Item onClick={this.filterContributions}>
+            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterGists}>
+              gist
+            </DropDown.Item>
+            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterFollowers}>
+              followers
+            </DropDown.Item>
+            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterRepositories}>
+              public repos
+            </DropDown.Item>
+            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterContributions}>
               contributions to all Angular repositories
             </DropDown.Item>
           </DropDownButton>
+          {this.filterInput()}
         </header>
 
         <main>

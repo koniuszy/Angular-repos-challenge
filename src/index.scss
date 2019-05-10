@@ -8,6 +8,8 @@ padding: 0;
 %flex-box{
   display: flex;
   flex-wrap: wrap;
+  justify-content: center;
+  align-content: flex-start;
 }
 
 body {
@@ -23,7 +25,8 @@ code {
 
 .container {
   @extend %flex-box;
-  justify-content: center;
+  width: 100vw;
+  min-height: 100vh;
 }
 
 .title {
@@ -35,6 +38,7 @@ code {
 
 ul {
   list-style-type: none;
+  margin-top: 50px;
   li{
     width: 75vw;
     padding-bottom: 20px;
@@ -50,4 +54,19 @@ h2 {
 
 h3 {
   color: #AEAEAE
+}
+
+.inputs {
+  position: absolute;
+  left: 220px;
+  top: 115px;
+}
+
+input {
+  width: 100px;
+  color: white;
+  background-color: $background-color;
+  margin: 0 10px;
+  outline: none;
+  border: 2px solid black;
 }
