@@ -43,8 +43,13 @@ ul {
     width: 75vw;
     padding-bottom: 20px;
     margin-bottom: 30px;
-    border-bottom: 0.5px solid #e1e4e8;
-    
+    border-bottom: 0.5px solid #e1e4e8; 
+  }
+  li:last-child {
+    border: none;
+    padding-bottom: 0;
+    margin-bottom: 0;
+    width: auto;
   }
 }
 
@@ -53,7 +58,8 @@ h2 {
 }
 
 h3 {
-  color: #AEAEAE
+  color: #AEAEAE;
+  width: 300px;
 }
 
 .inputs {
@@ -69,4 +75,14 @@ input {
   margin: 0 10px;
   outline: none;
   border: 2px solid black;
+}
+
+.x {
+  background-color: $background-color;
+  outline: none;
+  border: none;
+  color: white;
+  position: absolute;
+  left: 500px;
+  top: 115px;
 }

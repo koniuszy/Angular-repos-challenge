@@ -3,6 +3,12 @@ import DropDownButton from 'react-bootstrap/DropdownButton'
 import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
 class App extends React.Component {
+  constructor(props) {
+    super(props)
+    this.fromRef = React.createRef()
+    this.toRef = React.createRef()
+  }
+
   state = {
     isFetched: false,
     page: 1,
@@ -145,7 +151,7 @@ class App extends React.Component {
             <h2>{el.login}</h2>
             <h2>public gists: {el.public_gists}</h2>
             <h2>public repositories: {el.public_repos}</h2>
-            <h2>repositories in Angular: {contributorsTab[index].repeats}</h2>
+            <h2>repositories in Angular: {contributorsTab[index].repeats + 1}</h2>
           </li>
         )
         return 1
@@ -172,7 +178,7 @@ class App extends React.Component {
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.public_gists
     }).reverse()
-    this.newResults(tab, results)
+    this.newResults(tab, results, 'gists')
   }
 
   filterFollowers = () => {
@@ -180,15 +186,16 @@ class App extends React.Component {
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.followers
     }).reverse()
-    this.newResults(tab, results)
+    this.newResults(tab, results, 'followers')
   }
 
   filterRepositories = () => {
+    results
     let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.public_repos
     }).reverse()
-    this.newResults(tab, results)
+    this.newResults(tab, results, 'repositories')
   }
 
   filterContributions = () => {
@@ -196,10 +203,10 @@ class App extends React.Component {
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.repeats
     }).reverse()
-    this.newResults(tab, results)
+    this.newResults(tab, results, 'contributions')
   }
 
-  newResults = (tab, results) => {
+  newResults = (tab, results, filter) => {
     tab.map((el, index) => {
       results.push(
         <li key={index}>
@@ -208,11 +215,18 @@ class App extends React.Component {
           <h2>public gists: {el.public_gists}</h2>
           <h2>public repositories: {el.public_repos}</h2>
           <h2>followers: {el.followers}</h2>
-          <h2>repositories in Angular: {el.repeats}</h2>
+          <h2>repositories in Angular: {el.repeats + 1}</h2>
         </li>
       )
       return 1
     })
+    results.push(
+      <li key="filtering">
+        <h3>List is filtering by </h3>
+      </li>
+    )
+    results.push(filter)
+
     this.setState({
       results: results,
       isFiltering: true
@@ -222,11 +236,52 @@ class App extends React.Component {
   filterInput = () => {
     if (this.state.isFiltering) {
       return (
-        <div className="inputs">
-          from <input min={0} type="number" />
-          to <input min={1} type="number" />
-        </div>
+        <>
+          <div className="inputs">
+            <form onSubmit={this.handleSubmit}>
+              from <input ref={this.fromRef} min={0} type="number" />
+              to <input ref={this.toRef} min={1} type="number" />
+              <input type="submit" />
+            </form>
+          </div>
+          <button className="x">X</button>
+        </>
       )
+    }
+  }
+
+  filterBy = el => {
+    return (
+      el.public_gists >= this.fromRef.current.value && el.public_gists <= this.toRef.current.value
+    )
+  }
+
+  handleSubmit = e => {
+    e.preventDefault()
+    console.log(this.fromRef.current.value)
+    console.log(this.toRef.current.value)
+    switch (this.state.results[this.state.results.length - 1]) {
+      case 'gists':
+        console.log('gists!!!!!!!')
+        const filteredResults = this.state.contributionsWithDetails.filter(this.filterBy)
+        this.newResults(1, 2, e)
+        break
+
+      case 'followers':
+        console.log('followers!!!!!!!')
+
+        break
+
+      case 'repositories':
+        console.log('repositories!!!!!!!')
+        break
+
+      case 'contributions':
+        console.log('contributions!!!!!!!')
+        break
+
+      default:
+        break
     }
   }
 
