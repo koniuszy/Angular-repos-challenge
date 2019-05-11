@@ -20,6 +20,8 @@ padding: 0;
   outline: none;
   border: 2px solid black;
   padding-left: 10px;
+  outline: none;
+  cursor: pointer;
 }
 
 body {
@@ -69,13 +71,16 @@ ul {
   }
 }
 
+li{
+  list-style-type: none;
+}
+
 h2 {
   color: #a0b4c8;
 }
 
 h3 {
   color: #AEAEAE;
-  width: 400px;
 }
 
 .dropdown {
@@ -105,15 +110,23 @@ input {
 .ascending {
   @extend %top-squares;
   width: 200px;
-  outline: none;
   margin: 0px 10px 0px 420px;
-  cursor: pointer;
 }
 
 .ascending:focus{
   outline:0;
 }
 
+.descending {
+
+  @extend %top-squares;
+  width: 200px;
+  margin: 0px 10px 0px 10px;
+}
+
+.descending:focus{
+  outline:0;
+}
 
 form {
   width: 500px;
