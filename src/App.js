@@ -2,6 +2,9 @@ import React from 'react'
 import DropDownButton from 'react-bootstrap/DropdownButton'
 import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
+import { AwesomeButton } from 'react-awesome-button'
+import 'react-awesome-button/dist/styles.css'
+
 class App extends React.Component {
   constructor(props) {
     super(props)
@@ -18,7 +21,7 @@ class App extends React.Component {
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
     results: [],
-    isFiltering: false
+    isFiltering: true
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
@@ -162,7 +165,7 @@ class App extends React.Component {
       filteredBy = 'amount of contributions to all Angular repositories'
     }
     if (filter === false) {
-      filteredBy = 'nothing '
+      filteredBy = 'nothing right now'
     }
     let results = []
     tab.map((el, index) => {
@@ -231,37 +234,6 @@ class App extends React.Component {
     this.newResults(filteredResults, this.state.isFiltering)
   }
 
-  filterInput = () => {
-    if (this.state.isFiltering) {
-      return (
-        <>
-          <div className="inputs">
-            <form onSubmit={this.handleSubmit}>
-              from <input ref={this.fromRef} min={0} type="number" />
-              to <input ref={this.toRef} min={1} type="number" />
-              <input type="submit" />
-            </form>
-            <button onClick={() => this.ascending(false)} className="ascending">
-              Sort ascending
-            </button>
-            <button onClick={() => this.ascending(true)} className="descending">
-              Sort descending
-            </button>
-            <button
-              onClick={() => {
-                this.setState({ isFiltering: false })
-                this.newResults(this.state.contributionsWithDetails, false)
-              }}
-              className="x"
-            >
-              X
-            </button>
-          </div>
-        </>
-      )
-    }
-  }
-
   printRepositories = () => {
     return (
       <>
@@ -300,7 +272,45 @@ class App extends React.Component {
               contributions to all Angular repositories
             </DropDown.Item>
           </DropDownButton>
-          {this.filterInput()}
+          {this.state.isFiltering ? (
+            <div className="inputs">
+              <form onSubmit={this.handleSubmit}>
+                from
+                <input ref={this.fromRef} min={0} type="number" />
+                to
+                <input ref={this.toRef} min={1} type="number" />
+                <input className="submit" type="submit" />
+              </form>
+              <AwesomeButton
+                type="primary"
+                size="medium"
+                action={() => this.ascending(false)}
+                className="ascending"
+              >
+                Sort ascending
+              </AwesomeButton>
+              <AwesomeButton
+                type="primary"
+                size="medium"
+                action={() => this.ascending(true)}
+                className="descending"
+              >
+                Sort descending
+              </AwesomeButton>
+              <AwesomeButton
+                type="primary"
+                action={() => {
+                  this.setState({ isFiltering: false })
+                  this.newResults(this.state.contributionsWithDetails, false)
+                }}
+                size="medium"
+              >
+                Clear
+              </AwesomeButton>
+            </div>
+          ) : (
+            ''
+          )}
         </header>
 
         <main>

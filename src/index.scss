@@ -16,9 +16,9 @@ padding: 0;
   width: 100px;
   color: white;
   background-color: $background-color;
-  margin: 0 10px;
+  margin: 5px 10px;
   outline: none;
-  border: 2px solid black;
+  border: 2px solid #475472;;
   padding-left: 10px;
   outline: none;
   cursor: pointer;
@@ -95,20 +95,11 @@ input {
   @extend %top-squares
 }
 
-.x {
-  background-color: $background-color;
-  outline: none;
-  border: none;
-  color: white;
-  margin-left: 0px;
-}
-
 .x:focus{
   outline:0;
 }
 
 .ascending {
-  @extend %top-squares;
   width: 200px;
   margin: 0px 10px 0px 420px;
 }
@@ -118,10 +109,8 @@ input {
 }
 
 .descending {
-
-  @extend %top-squares;
   width: 200px;
-  margin: 0px 10px 0px 10px;
+  margin: 0px 20px 0px 10px;
 }
 
 .descending:focus{
@@ -132,3 +121,34 @@ form {
   width: 500px;
   position: absolute;
 }
+
+.aws-btn {
+  --button-default-height: 48px;
+  --button-default-font-size: 14px;
+  --button-default-border-radius: 6px;
+  --button-horizontal-padding: 20px;
+  --button-raise-level: 5px;
+  --button-hover-pressure: 2;
+  --transform-speed: 0.185s;
+  --button-primary-color: #475472;
+  --button-primary-color-dark: #2a3143;
+  --button-primary-color-light: #d4d9e4;
+  --button-primary-color-hover: #424e6a;
+  --button-primary-border: none;
+  }
+
+  .submit {
+    border: none;
+    background-color: #475472;
+    border-radius: 6px;
+    height: 28px;
+    font-size: 14px;
+    transition: background-color 300ms;
+  }
+  .submit:hover {
+    background-color: #2a3143;
+  }
+
+  .submit:active {
+    background-color: #424e6a;
+  }
