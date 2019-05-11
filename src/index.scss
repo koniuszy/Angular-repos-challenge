@@ -75,7 +75,7 @@ h2 {
 
 h3 {
   color: #AEAEAE;
-  width: 300px;
+  width: 400px;
 }
 
 .dropdown {
@@ -95,22 +95,27 @@ input {
   outline: none;
   border: none;
   color: white;
-  margin-left: 80px;
+  margin-left: 0px;
 }
 
 .x:focus{
   outline:0;
 }
 
-.sort {
+.ascending {
   @extend %top-squares;
   width: 200px;
   outline: none;
-  :focus{
-    outline:0;
-  }
+  margin: 0px 10px 0px 420px;
+  cursor: pointer;
 }
 
-.sort:focus{
-    outline:0;
+.ascending:focus{
+  outline:0;
+}
+
+
+form {
+  width: 500px;
+  position: absolute;
 }

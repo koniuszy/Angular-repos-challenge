@@ -8,7 +8,6 @@ class App extends React.Component {
     this.fromRef = React.createRef()
     this.toRef = React.createRef()
   }
-
   state = {
     isFetched: false,
     page: 1,
@@ -23,6 +22,10 @@ class App extends React.Component {
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
+  GISTS = 'public_gists'
+  FOLLOWERS = 'followers'
+  REPOSITORIES = 'public_repos'
+  CONTRIBUTIONS = 'repeats'
 
   componentDidMount() {
     this.fetchRepositories()
@@ -148,37 +151,9 @@ class App extends React.Component {
           contributionsWithDetails: contributionsWithRepeats,
           isFetched: true
         },
-        () => this.newResults(this.state.contributionsWithDetails, 'none')
+        () => this.newResults(this.state.contributionsWithDetails, false)
       )
     }
-  }
-
-  filterGists = () => {
-    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
-      return o.public_gists
-    }).reverse()
-    this.newResults(tab, 'gists')
-  }
-
-  filterFollowers = () => {
-    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
-      return o.followers
-    }).reverse()
-    this.newResults(tab, 'followers')
-  }
-
-  filterRepositories = () => {
-    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
-      return o.public_repos
-    }).reverse()
-    this.newResults(tab, 'repositories')
-  }
-
-  filterContributions = () => {
-    let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
-      return o.repeats
-    }).reverse()
-    this.newResults(tab, 'contributions')
   }
 
   newResults = (tab, filter) => {
@@ -201,38 +176,84 @@ class App extends React.Component {
         <h3>The list is filtered by {filter} </h3>
       </li>
     )
-
     this.setState({
       results: results
     })
-
-    if (filter !== 'none') {
+    if (filter) {
       this.setState({
         isFiltering: filter
       })
     }
+  }
 
-    this.clearInputs()
+  sort = filter => {
+    let tab = _.sortBy(this.state.contributionsWithDetails, o => o[filter]).reverse()
+    this.newResults(tab, filter)
+  }
+
+  filterBy = el => {
+    if (this.fromRef.current.value === '' && this.toRef.current.value === '') {
+      return true
+    } else {
+      if (this.fromRef.current.value === '') {
+        return el <= this.toRef.current.value
+      } else if (this.toRef.current.value === '') {
+        return el >= this.fromRef.current.value
+      } else {
+        return el >= this.fromRef.current.value && el <= this.toRef.current.value
+      }
+    }
   }
 
   ascending = () => {
     const filter = this.state.isFiltering
     let users = this.state.contributionsWithDetails
-    const min = this.fromRef.current.value
-    const max = this.toRef.current.value
 
-    if (filter === 'public_gists') {
-      users = this.state.contributionsWithDetails.filter(el => this.filterBy(el.public_gists))
-    }
+    users = this.state.contributionsWithDetails.filter(el => this.filterBy(el[filter]))
+    users = _.sortBy(users, o => o[filter])
 
-    _.sortBy(users, function(o) {
-      return o.repeats
-    })
-
+    console.log(users)
+    users.reverse()
+    console.log(users)
     this.newResults(users, filter)
   }
 
-  descending = () => {}
+  handleSubmit = e => {
+    e.preventDefault()
+    let switcher = this.state.isFiltering
+    let filteredResults
+
+    switch (switcher) {
+      case this.GISTS:
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.public_gists)
+        )
+        break
+
+      case this.FOLLOWERS:
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.followers)
+        )
+        break
+
+      case this.REPOSITORIES:
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.public_repos)
+        )
+        break
+
+      case this.CONTRIBUTIONS:
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.repeats)
+        )
+        break
+
+      default:
+        break
+    }
+
+    this.newResults(filteredResults, switcher)
+  }
 
   filterInput = () => {
     if (this.state.isFiltering) {
@@ -243,80 +264,22 @@ class App extends React.Component {
               from <input ref={this.fromRef} min={0} type="number" />
               to <input ref={this.toRef} min={1} type="number" />
               <input type="submit" />
-              <button onClick={this.ascending} className="sort">
-                Sort ascending{' '}
-              </button>
-              <button onClick={this.descending} className="sort">
-                Sort descending{' '}
-              </button>
             </form>
+            <button onClick={this.ascending} className="ascending">
+              Sort
+            </button>
+            <button
+              onClick={() => {
+                this.setState({ isFiltering: false })
+                this.newResults(this.state.contributionsWithDetails, 'none')
+              }}
+              className="x"
+            >
+              X
+            </button>
           </div>
-          <button
-            onClick={() => {
-              this.setState({ isFiltering: false })
-              this.newResults(this.state.contributionsWithDetails, 'none')
-            }}
-            className="x"
-          >
-            X
-          </button>
         </>
       )
-    }
-  }
-
-  clearInputs = () => {
-    this.toRef.current.value = ''
-    this.fromRef.current.value = ''
-  }
-
-  filterBy = el => {
-    if (this.fromRef.current.value === '' && this.toRef.current.value === '') {
-      return true
-    } else {
-      if (this.fromRef.current.value === '') {
-        return el <= this.toRef.current.value
-      } else {
-        return el >= this.fromRef.current.value && el <= this.toRef.current.value
-      }
-    }
-  }
-
-  handleSubmit = e => {
-    e.preventDefault()
-    let switcher = this.state.isFiltering
-    let filteredResults
-    switch (switcher) {
-      case 'gists':
-        filteredResults = this.state.contributionsWithDetails.filter(el =>
-          this.filterBy(el.public_gists)
-        )
-        this.newResults(filteredResults, switcher)
-        break
-
-      case 'followers':
-        filteredResults = this.state.contributionsWithDetails.filter(el =>
-          this.filterBy(el.followers)
-        )
-        this.newResults(filteredResults, switcher)
-        break
-
-      case 'repositories':
-        filteredResults = this.state.contributionsWithDetails.filter(el =>
-          this.filterBy(el.public_repos)
-        )
-        this.newResults(filteredResults, switcher)
-        break
-
-      case 'contributions':
-        filteredResults = this.state.contributionsWithDetails.filter(el =>
-          this.filterBy(el.repeats)
-        )
-        this.newResults(filteredResults, switcher)
-        break
-
-      default:
-        break
     }
   }
 
@@ -335,16 +298,25 @@ class App extends React.Component {
         <header>
           <h1 className="title">Angular repos</h1>
           <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterGists}>
+            <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(this.GISTS)}>
               gist
             </DropDown.Item>
-            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterFollowers}>
+            <DropDown.Item
+              disabled={!this.state.isFetched}
+              onClick={() => this.sort(this.FOLLOWERS)}
+            >
               followers
             </DropDown.Item>
-            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterRepositories}>
+            <DropDown.Item
+              disabled={!this.state.isFetched}
+              onClick={() => this.sort(this.REPOSITORIES)}
+            >
               public repos
             </DropDown.Item>
-            <DropDown.Item disabled={!this.state.isFetched} onClick={this.filterContributions}>
+            <DropDown.Item
+              disabled={!this.state.isFetched}
+              onClick={() => this.sort(this.CONTRIBUTIONS)}
+            >
               contributions to all Angular repositories
             </DropDown.Item>
           </DropDownButton>
