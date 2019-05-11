@@ -12,6 +12,16 @@ padding: 0;
   align-content: flex-start;
 }
 
+%top-squares{
+  width: 100px;
+  color: white;
+  background-color: $background-color;
+  margin: 0 10px;
+  outline: none;
+  border: 2px solid black;
+  padding-left: 10px;
+}
+
 body {
   @extend %no-margin-and-paddings;
   background-color: $background-color;
@@ -51,6 +61,12 @@ ul {
     margin-bottom: 0;
     width: auto;
   }
+  li:first-child {
+    width: 75vw;
+    padding-bottom: 20px;
+    margin-bottom: 30px;
+    border-bottom: 0.5px solid #e1e4e8; 
+  }
 }
 
 h2 {
@@ -62,19 +78,16 @@ h3 {
   width: 300px;
 }
 
-.inputs {
+.dropdown {
   position: absolute;
-  left: 220px;
-  top: 115px;
+}
+
+.inputs {
+  margin-left: 100px;
 }
 
 input {
-  width: 100px;
-  color: white;
-  background-color: $background-color;
-  margin: 0 10px;
-  outline: none;
-  border: 2px solid black;
+  @extend %top-squares
 }
 
 .x {
@@ -82,7 +95,22 @@ input {
   outline: none;
   border: none;
   color: white;
-  position: absolute;
-  left: 500px;
-  top: 115px;
+  margin-left: 80px;
+}
+
+.x:focus{
+  outline:0;
+}
+
+.sort {
+  @extend %top-squares;
+  width: 200px;
+  outline: none;
+  :focus{
+    outline:0;
+  }
+}
+
+.sort:focus{
+    outline:0;
 }

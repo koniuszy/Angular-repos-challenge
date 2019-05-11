@@ -25,7 +25,7 @@ class App extends React.Component {
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
 
   componentDidMount() {
-    // this.fetchRepositories()
+    this.fetchRepositories()
   }
 
   fetchRepositories = () => {
@@ -143,70 +143,46 @@ class App extends React.Component {
         return 1
       })
 
-      let results = []
-      this.state.contributionsWithDetails.map((el, index) => {
-        results.push(
-          <li key={index}>
-            <h2>{index + 1}</h2>
-            <h2>{el.login}</h2>
-            <h2>public gists: {el.public_gists}</h2>
-            <h2>public repositories: {el.public_repos}</h2>
-            <h2>repositories in Angular: {contributorsTab[index].repeats + 1}</h2>
-          </li>
-        )
-        return 1
-      })
-      this.setState({
-        contributionsWithDetails: contributionsWithRepeats,
-        results: results,
-        isFetched: true
-      })
+      this.setState(
+        {
+          contributionsWithDetails: contributionsWithRepeats,
+          isFetched: true
+        },
+        () => this.newResults(this.state.contributionsWithDetails, 'none')
+      )
     }
   }
 
-  printRepositories = () => {
-    return (
-      <>
-        <h2 className="title"> {this.state.contributionsWithDetails.length} users was found</h2>
-        <ul>{this.state.results}</ul>
-      </>
-    )
-  }
-
   filterGists = () => {
-    let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.public_gists
     }).reverse()
-    this.newResults(tab, results, 'gists')
+    this.newResults(tab, 'gists')
   }
 
   filterFollowers = () => {
-    let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.followers
     }).reverse()
-    this.newResults(tab, results, 'followers')
+    this.newResults(tab, 'followers')
   }
 
   filterRepositories = () => {
-    results
-    let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.public_repos
     }).reverse()
-    this.newResults(tab, results, 'repositories')
+    this.newResults(tab, 'repositories')
   }
 
   filterContributions = () => {
-    let results = []
     let tab = _.sortBy(this.state.contributionsWithDetails, function(o) {
       return o.repeats
     }).reverse()
-    this.newResults(tab, results, 'contributions')
+    this.newResults(tab, 'contributions')
   }
 
-  newResults = (tab, results, filter) => {
+  newResults = (tab, filter) => {
+    let results = []
     tab.map((el, index) => {
       results.push(
         <li key={index}>
@@ -222,16 +198,41 @@ class App extends React.Component {
     })
     results.push(
       <li key="filtering">
-        <h3>List is filtering by </h3>
+        <h3>The list is filtered by {filter} </h3>
       </li>
     )
-    results.push(filter)
 
     this.setState({
-      results: results,
-      isFiltering: true
+      results: results
     })
+
+    if (filter !== 'none') {
+      this.setState({
+        isFiltering: filter
+      })
+    }
+
+    this.clearInputs()
   }
+
+  ascending = () => {
+    const filter = this.state.isFiltering
+    let users = this.state.contributionsWithDetails
+    const min = this.fromRef.current.value
+    const max = this.toRef.current.value
+
+    if (filter === 'public_gists') {
+      users = this.state.contributionsWithDetails.filter(el => this.filterBy(el.public_gists))
+    }
+
+    _.sortBy(users, function(o) {
+      return o.repeats
+    })
+
+    this.newResults(users, filter)
+  }
+
+  descending = () => {}
 
   filterInput = () => {
     if (this.state.isFiltering) {
@@ -242,47 +243,90 @@ class App extends React.Component {
               from <input ref={this.fromRef} min={0} type="number" />
               to <input ref={this.toRef} min={1} type="number" />
               <input type="submit" />
+              <button onClick={this.ascending} className="sort">
+                Sort ascending{' '}
+              </button>
+              <button onClick={this.descending} className="sort">
+                Sort descending{' '}
+              </button>
             </form>
           </div>
-          <button className="x">X</button>
+          <button
+            onClick={() => {
+              this.setState({ isFiltering: false })
+              this.newResults(this.state.contributionsWithDetails, 'none')
+            }}
+            className="x"
+          >
+            X
+          </button>
         </>
       )
     }
   }
 
+  clearInputs = () => {
+    this.toRef.current.value = ''
+    this.fromRef.current.value = ''
+  }
+
   filterBy = el => {
-    return (
-      el.public_gists >= this.fromRef.current.value && el.public_gists <= this.toRef.current.value
-    )
+    if (this.fromRef.current.value === '' && this.toRef.current.value === '') {
+      return true
+    } else {
+      if (this.fromRef.current.value === '') {
+        return el <= this.toRef.current.value
+      } else {
+        return el >= this.fromRef.current.value && el <= this.toRef.current.value
+      }
+    }
   }
 
   handleSubmit = e => {
     e.preventDefault()
-    console.log(this.fromRef.current.value)
-    console.log(this.toRef.current.value)
-    switch (this.state.results[this.state.results.length - 1]) {
+    let switcher = this.state.isFiltering
+    let filteredResults
+    switch (switcher) {
       case 'gists':
-        console.log('gists!!!!!!!')
-        const filteredResults = this.state.contributionsWithDetails.filter(this.filterBy)
-        this.newResults(1, 2, e)
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.public_gists)
+        )
+        this.newResults(filteredResults, switcher)
         break
 
       case 'followers':
-        console.log('followers!!!!!!!')
-
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.followers)
+        )
+        this.newResults(filteredResults, switcher)
         break
 
       case 'repositories':
-        console.log('repositories!!!!!!!')
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.public_repos)
+        )
+        this.newResults(filteredResults, switcher)
         break
 
       case 'contributions':
-        console.log('contributions!!!!!!!')
+        filteredResults = this.state.contributionsWithDetails.filter(el =>
+          this.filterBy(el.repeats)
+        )
+        this.newResults(filteredResults, switcher)
         break
 
       default:
         break
     }
+  }
+
+  printRepositories = () => {
+    return (
+      <>
+        <h2 className="title"> {this.state.results.length - 1} users were found</h2>
+        <ul>{this.state.results}</ul>
+      </>
+    )
   }
 
   render() {
@@ -315,6 +359,7 @@ class App extends React.Component {
               <ul>
                 <li>
                   <h2>Loading....</h2>
+                  <h3>It can takes one minute</h3>
                 </li>
               </ul>
             )}
