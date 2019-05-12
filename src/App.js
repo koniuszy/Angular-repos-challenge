@@ -4,6 +4,7 @@ import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
 import { AwesomeButton } from 'react-awesome-button'
 import 'react-awesome-button/dist/styles.css'
+import UserProfile from './userProfile'
 
 class App extends React.Component {
   constructor(props) {
@@ -21,7 +22,8 @@ class App extends React.Component {
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
     results: [],
-    isFiltering: true
+    isFiltering: false,
+    isProfile: false
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
@@ -177,6 +179,14 @@ class App extends React.Component {
           <h2>public repositories: {el.public_repos}</h2>
           <h2>followers: {el.followers}</h2>
           <h2>repositories in Angular: {el.repeats + 1}</h2>
+          <h3
+            className="pointer"
+            onClick={() => {
+              this.setState({ isFiltering: false, isFetched: false, isProfile: el.url })
+            }}
+          >
+            visit profile
+          </h3>
         </li>
       )
       return 1
@@ -234,44 +244,46 @@ class App extends React.Component {
     this.newResults(filteredResults, this.state.isFiltering)
   }
 
-  printRepositories = () => {
-    return (
-      <>
-        <h2 className="title"> {this.state.results.length - 1} users were found</h2>
-        <h2>{this.state.results[this.state.results.length - 1]} </h2>
-        <ul>{this.state.results}</ul>
-      </>
-    )
+  comeBack = () => {
+    this.setState({
+      isFetched: true,
+      isProfile: false
+    })
   }
 
   render() {
     return (
       <div className="container">
         <header>
-          <h1 className="title">Angular repos</h1>
-          <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-            <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(this.GISTS)}>
-              gist
-            </DropDown.Item>
-            <DropDown.Item
-              disabled={!this.state.isFetched}
-              onClick={() => this.sort(this.FOLLOWERS)}
-            >
-              followers
-            </DropDown.Item>
-            <DropDown.Item
-              disabled={!this.state.isFetched}
-              onClick={() => this.sort(this.REPOSITORIES)}
-            >
-              public repos
-            </DropDown.Item>
-            <DropDown.Item
-              disabled={!this.state.isFetched}
-              onClick={() => this.sort(this.CONTRIBUTIONS)}
-            >
-              contributions to all Angular repositories
-            </DropDown.Item>
-          </DropDownButton>
+          <h1 className="title">Frontend developer challenge</h1>
+          {this.state.isFetched ? (
+            <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
+              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(this.GISTS)}>
+                gist
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.FOLLOWERS)}
+              >
+                followers
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.REPOSITORIES)}
+              >
+                public repos
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.CONTRIBUTIONS)}
+              >
+                contributions to all Angular repositories
+              </DropDown.Item>
+            </DropDownButton>
+          ) : (
+            ''
+          )}
+
           {this.state.isFiltering ? (
             <div className="inputs">
               <form onSubmit={this.handleSubmit}>
@@ -316,12 +328,18 @@ class App extends React.Component {
         <main>
           <div>
             {this.state.isFetched ? (
-              this.printRepositories()
+              <>
+                <h2 className="title"> {this.state.results.length - 1} users were found</h2>
+                <h2>{this.state.results[this.state.results.length - 1]} </h2>
+                <ul>{this.state.results}</ul>
+              </>
+            ) : this.state.isProfile ? (
+              <UserProfile handleClick={this.comeBack} url={this.state.isProfile} />
             ) : (
               <ul>
                 <li>
                   <h2>Loading....</h2>
-                  <h3>It can takes one minute</h3>
+                  <h3>It can take up to one minute</h3>
                 </li>
               </ul>
             )}

@@ -35,19 +35,6 @@ code {
     monospace;
 }
 
-.container {
-  @extend %flex-box;
-  width: 100vw;
-  min-height: 100vh;
-}
-
-.title {
-  border-bottom: 0.5px solid gray;
-  width: 90vw;
-  text-align: center;
-  line-height: 100px;
-}
-
 ul {
   list-style-type: none;
   margin-top: 50px;
@@ -83,16 +70,41 @@ h3 {
   color: #AEAEAE;
 }
 
+form {
+  width: 500px;
+  position: absolute;
+}
+input {
+  @extend %top-squares
+}
+
+img {
+  position: absolute;
+  width: 200px;
+  height: 200px;
+  margin-top: 50px;
+}
+
+.container {
+  @extend %flex-box;
+  width: 100vw;
+  min-height: 100vh;
+}
+
+.title {
+  border-bottom: 0.5px solid gray;
+  width: 90vw;
+  text-align: center;
+  line-height: 70px;
+}
+
+
 .dropdown {
   position: absolute;
 }
 
 .inputs {
   margin-left: 100px;
-}
-
-input {
-  @extend %top-squares
 }
 
 .x:focus{
@@ -115,11 +127,6 @@ input {
 
 .descending:focus{
   outline:0;
-}
-
-form {
-  width: 500px;
-  position: absolute;
 }
 
 .aws-btn {
@@ -151,4 +158,25 @@ form {
 
   .submit:active {
     background-color: #424e6a;
+  }
+
+  .pointer {
+    cursor: pointer;
+  }
+
+  .welcome {
+    color: #a0b4c8;
+  }
+
+  .imgContainer {
+   height: 150px;
+  }
+
+  .margin{
+    margin-left: 250px;
+  }
+  
+  .userContainer{
+    width: 80vw;
+    overflow: hidden;
   }
