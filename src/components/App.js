@@ -1,19 +1,14 @@
 import React from 'react'
+
+import UserProfile from './userProfile'
+import 'react-awesome-button/dist/styles.css'
+
 import DropDownButton from 'react-bootstrap/DropdownButton'
 import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
 import { AwesomeButton } from 'react-awesome-button'
-import 'react-awesome-button/dist/styles.css'
-import UserProfile from './userProfile'
-import { Provider } from 'redux-react'
-import store from './store'
 
 class App extends React.Component {
-  constructor(props) {
-    super(props)
-    this.fromRef = React.createRef()
-    this.toRef = React.createRef()
-  }
   state = {
     isFetched: false,
     page: 1,
@@ -24,8 +19,10 @@ class App extends React.Component {
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
     results: [],
-    isFiltering: false,
-    isProfile: false
+    isFiltering: true,
+    isProfile: false,
+    inputFrom: '',
+    inputTo: ''
   }
 
   REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
@@ -35,7 +32,7 @@ class App extends React.Component {
   CONTRIBUTIONS = 'repeats'
 
   componentDidMount() {
-    this.fetchRepositories()
+    // this.fetchRepositories()
   }
 
   fetchRepositories = () => {
@@ -225,15 +222,17 @@ class App extends React.Component {
   }
 
   filterBy = el => {
-    if (this.fromRef.current.value === '' && this.toRef.current.value === '') {
+    const from = this.state.inputFrom
+    const to = this.state.inputTo
+    if (from === '' && to === '') {
       return true
     } else {
-      if (this.fromRef.current.value === '') {
-        return el <= this.toRef.current.value
-      } else if (this.toRef.current.value === '') {
-        return el >= this.fromRef.current.value
+      if (from === '') {
+        return el <= to
+      } else if (to === '') {
+        return el >= from
       } else {
-        return el >= this.fromRef.current.value && el <= this.toRef.current.value
+        return el >= from && el <= to
       }
     }
   }
@@ -253,106 +252,119 @@ class App extends React.Component {
     })
   }
 
+  handleChange = e => {
+    this.setState({
+      [e.target.name]: e.target.value
+    })
+  }
+
   render() {
     return (
-      <Provider store={store}>
-        <div className="container">
-          <header>
-            <h1 className="title">Frontend developer challenge</h1>
-            {this.state.isFetched ? (
-              <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-                <DropDown.Item
-                  disabled={!this.state.isFetched}
-                  onClick={() => this.sort(this.GISTS)}
-                >
-                  gist
-                </DropDown.Item>
-                <DropDown.Item
-                  disabled={!this.state.isFetched}
-                  onClick={() => this.sort(this.FOLLOWERS)}
-                >
-                  followers
-                </DropDown.Item>
-                <DropDown.Item
-                  disabled={!this.state.isFetched}
-                  onClick={() => this.sort(this.REPOSITORIES)}
-                >
-                  public repos
-                </DropDown.Item>
-                <DropDown.Item
-                  disabled={!this.state.isFetched}
-                  onClick={() => this.sort(this.CONTRIBUTIONS)}
-                >
-                  contributions to all Angular repositories
-                </DropDown.Item>
-              </DropDownButton>
-            ) : (
-              ''
-            )}
+      <div className="container">
+        <header>
+          <h1 className="title">Frontend developer challenge</h1>
+          {this.state.isFetched ? (
+            <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
+              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(this.GISTS)}>
+                gist
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.FOLLOWERS)}
+              >
+                followers
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.REPOSITORIES)}
+              >
+                public repos
+              </DropDown.Item>
+              <DropDown.Item
+                disabled={!this.state.isFetched}
+                onClick={() => this.sort(this.CONTRIBUTIONS)}
+              >
+                contributions to all Angular repositories
+              </DropDown.Item>
+            </DropDownButton>
+          ) : (
+            ''
+          )}
 
-            {this.state.isFiltering ? (
-              <div className="inputs">
-                <form onSubmit={this.handleSubmit}>
-                  from
-                  <input ref={this.fromRef} min={0} type="number" />
-                  to
-                  <input ref={this.toRef} min={1} type="number" />
-                  <input className="submit" type="submit" />
-                </form>
-                <AwesomeButton
-                  type="primary"
-                  size="medium"
-                  action={() => this.ascending(false)}
-                  className="ascending"
-                >
-                  Sort ascending
-                </AwesomeButton>
-                <AwesomeButton
-                  type="primary"
-                  size="medium"
-                  action={() => this.ascending(true)}
-                  className="descending"
-                >
-                  Sort descending
-                </AwesomeButton>
-                <AwesomeButton
-                  type="primary"
-                  action={() => {
-                    this.setState({ isFiltering: false })
-                    this.newResults(this.state.contributionsWithDetails, false)
-                  }}
-                  size="medium"
-                >
-                  Clear
-                </AwesomeButton>
-              </div>
-            ) : (
-              ''
-            )}
-          </header>
-
-          <main>
-            <div>
-              {this.state.isFetched ? (
-                <>
-                  <h2 className="title"> {this.state.results.length - 1} users were found</h2>
-                  <h2>{this.state.results[this.state.results.length - 1]} </h2>
-                  <ul>{this.state.results}</ul>
-                </>
-              ) : this.state.isProfile ? (
-                <UserProfile handleClick={this.comeBack} url={this.state.isProfile} />
-              ) : (
-                <ul>
-                  <li>
-                    <h2>Loading....</h2>
-                    <h3>It can take up to one minute</h3>
-                  </li>
-                </ul>
-              )}
+          {this.state.isFiltering ? (
+            <div className="inputs">
+              <form onSubmit={this.handleSubmit}>
+                from
+                <input
+                  min={0}
+                  type="number"
+                  name="inputFrom"
+                  value={this.state.inputFrom}
+                  onChange={this.handleChange}
+                />
+                to
+                <input
+                  min={1}
+                  type="number"
+                  name="inputTo"
+                  value={this.state.inputTo}
+                  onChange={this.handleChange}
+                />
+                <input className="submit" type="submit" />
+              </form>
+              <AwesomeButton
+                type="primary"
+                size="medium"
+                action={() => this.ascending(false)}
+                className="ascending"
+              >
+                Sort ascending
+              </AwesomeButton>
+              <AwesomeButton
+                type="primary"
+                size="medium"
+                action={() => this.ascending(true)}
+                className="descending"
+              >
+                Sort descending
+              </AwesomeButton>
+              <AwesomeButton
+                type="primary"
+                action={() => {
+                  this.setState({ isFiltering: false })
+                  this.newResults(this.state.contributionsWithDetails, false)
+                }}
+                size="medium"
+              >
+                Clear
+              </AwesomeButton>
             </div>
-          </main>
-        </div>
-      </Provider>
+          ) : (
+            ''
+          )}
+        </header>
+
+        <main>
+          <div>
+            {this.state.isFetched ? (
+              <>
+                <h2 className="title"> {this.state.results.length - 1} users were found</h2>
+                <h2>{this.state.results[this.state.results.length - 1]} </h2>
+                <ul>{this.state.results}</ul>
+              </>
+            ) : this.state.isProfile ? (
+              <UserProfile handleClick={this.comeBack} url={this.state.isProfile} />
+            ) : (
+              <ul>
+                <li>
+                  <h2>Loading....</h2>
+                  <h3>It can take up to one minute</h3>
+                </li>
+              </ul>
+            )}
+          </div>
+        </main>
+      </div>
     )
   }
 }
