@@ -7,6 +7,16 @@ import DropDownButton from 'react-bootstrap/DropdownButton'
 import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
 import { AwesomeButton } from 'react-awesome-button'
+import { connect } from 'react-redux'
+import { counter } from '../redux/actions'
+import {
+  REPOSITORIESLINK,
+  GISTS,
+  FOLLOWERS,
+  REPOSITORIES,
+  CONTRIBUTIONS,
+  TOKEN
+} from '../constants'
 
 class App extends React.Component {
   state = {
@@ -19,27 +29,21 @@ class App extends React.Component {
     contributorsWithoutRepeats: [],
     contributionsWithDetails: [],
     results: [],
-    isFiltering: true,
+    isFiltering: false,
     isProfile: false,
     inputFrom: '',
     inputTo: ''
   }
 
-  REPOSITORIESLINK = `https://api.github.com/search/repositories?q=user:angular&per_page=100&page=`
-  GISTS = 'public_gists'
-  FOLLOWERS = 'followers'
-  REPOSITORIES = 'public_repos'
-  CONTRIBUTIONS = 'repeats'
-
   componentDidMount() {
-    // this.fetchRepositories()
+    this.fetchRepositories()
   }
 
   fetchRepositories = () => {
-    fetch(this.REPOSITORIESLINK + this.state.page, {
+    fetch(REPOSITORIESLINK + this.state.page, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(this.setState({ page: this.state.page + 1 }))
@@ -69,7 +73,7 @@ class App extends React.Component {
       fetch(el, {
         method: 'GET',
         headers: {
-          Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+          Authorization: TOKEN
         }
       })
         .then(response => {
@@ -128,7 +132,7 @@ class App extends React.Component {
     fetch(el, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(response => response.json())
@@ -162,7 +166,7 @@ class App extends React.Component {
 
   newResults = (tab, filter) => {
     let filteredBy = filter
-    if (filter === this.CONTRIBUTIONS) {
+    if (filter === CONTRIBUTIONS) {
       filteredBy = 'amount of contributions to all Angular repositories'
     }
     if (filter === false) {
@@ -258,6 +262,10 @@ class App extends React.Component {
     })
   }
 
+  test = () => {
+    this.props.dispatch({ type: 'INCREMENT' })
+  }
+
   render() {
     return (
       <div className="container">
@@ -265,24 +273,21 @@ class App extends React.Component {
           <h1 className="title">Frontend developer challenge</h1>
           {this.state.isFetched ? (
             <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(this.GISTS)}>
+              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(GISTS)}>
                 gist
               </DropDown.Item>
-              <DropDown.Item
-                disabled={!this.state.isFetched}
-                onClick={() => this.sort(this.FOLLOWERS)}
-              >
+              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(FOLLOWERS)}>
                 followers
               </DropDown.Item>
               <DropDown.Item
                 disabled={!this.state.isFetched}
-                onClick={() => this.sort(this.REPOSITORIES)}
+                onClick={() => this.sort(REPOSITORIES)}
               >
                 public repos
               </DropDown.Item>
               <DropDown.Item
                 disabled={!this.state.isFetched}
-                onClick={() => this.sort(this.CONTRIBUTIONS)}
+                onClick={() => this.sort(CONTRIBUTIONS)}
               >
                 contributions to all Angular repositories
               </DropDown.Item>
@@ -360,6 +365,9 @@ class App extends React.Component {
                   <h2>Loading....</h2>
                   <h3>It can take up to one minute</h3>
                 </li>
+                <AwesomeButton action={this.test} type="primary" size="medium">
+                  nr {this.props.number}
+                </AwesomeButton>
               </ul>
             )}
           </div>
@@ -369,4 +377,4 @@ class App extends React.Component {
   }
 }
 
-export default App
+export default connect(counter)(App)
