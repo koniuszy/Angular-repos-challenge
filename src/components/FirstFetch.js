@@ -3,6 +3,8 @@ import { REPOSITORIESLINK, TOKEN } from '../constants'
 import { connect } from 'react-redux'
 import { fillContributors } from '../redux/actions'
 import App from './App'
+import UserProfile from './userProfile/userProfile'
+import Repository from './Repository/Repository'
 
 class FetchAngularRepositories extends React.Component {
   state = {
@@ -88,7 +90,7 @@ class FetchAngularRepositories extends React.Component {
 
       this.state.contributors.map(el => {
         el.map(element => {
-          console.log('I am pushing props about repeats')
+          console.log('I am pushing props "repeats"')
           if (checkID.includes(element.id)) {
             let position = checkID.indexOf(element.id)
             contributorsTab[position].repeats++
@@ -155,6 +157,8 @@ class FetchAngularRepositories extends React.Component {
             <h3 style={{ paddingBottom: '50px' }}>It can take up to one minute</h3>
           </>
         )}
+        {this.props.isUserProfile ? <UserProfile /> : ''}
+        {this.props.isRepositoryProfile ? <Repository /> : ''}
       </>
     )
   }
@@ -162,7 +166,9 @@ class FetchAngularRepositories extends React.Component {
 
 const mapStateToProps = state => ({
   contributionsWithDetails: state.contributionsWithDetails,
-  isFetched: state.isFetched
+  isFetched: state.isFetched,
+  isUserProfile: state.isUserProfile,
+  isRepositoryProfile: state.isRepositoryProfile
 })
 
 export default connect(

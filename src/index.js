@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Fetch from './components/Fetch'
+import Fetch from './components/FirstFetch'
 import * as serviceWorker from './serviceWorker'
 
 import store from './redux/store'

@@ -1,15 +1,14 @@
 import React from 'react'
 
-import UserProfile from './userProfile'
-import 'react-awesome-button/dist/styles.css'
-
 import DropDownButton from 'react-bootstrap/DropdownButton'
 import DropDown from 'react-bootstrap/Dropdown'
-import _ from 'lodash'
 import { AwesomeButton } from 'react-awesome-button'
 import { connect } from 'react-redux'
-// import { counter } from '../redux/actions'
 import { GISTS, FOLLOWERS, REPOSITORIES, CONTRIBUTIONS } from '../constants'
+import { goToUserProfile } from '../redux/actions'
+
+import 'react-awesome-button/dist/styles.css'
+import _ from 'lodash'
 
 class App extends React.Component {
   state = {
@@ -17,7 +16,8 @@ class App extends React.Component {
     isFiltering: false,
     isProfile: false,
     inputFrom: '',
-    inputTo: ''
+    inputTo: '',
+    contributionsWithDetails: []
   }
 
   componentDidMount() {
@@ -25,12 +25,14 @@ class App extends React.Component {
   }
 
   newResults = (tab, filter) => {
-    this.setState({ isFetched: true })
     let filteredBy = filter
     if (filter === CONTRIBUTIONS) {
       filteredBy = 'amount of contributions to all Angular repositories'
     }
     if (filter === false) {
+      this.setState({
+        contributionsWithDetails: this.props.contributionsWithDetails
+      })
       filteredBy = 'nothing right now'
     }
     let results = []
@@ -46,7 +48,7 @@ class App extends React.Component {
           <h3
             className="pointer"
             onClick={() => {
-              this.setState({ isFiltering: false, isFetched: false, isProfile: el.url })
+              this.props.goToUserProfile(el.url)
             }}
           >
             visit profile
@@ -110,13 +112,6 @@ class App extends React.Component {
     this.newResults(filteredResults, this.state.isFiltering)
   }
 
-  comeBack = () => {
-    this.setState({
-      isFetched: true,
-      isProfile: false
-    })
-  }
-
   handleChange = e => {
     this.setState({
       [e.target.name]: e.target.value
@@ -128,30 +123,14 @@ class App extends React.Component {
       <div className="container">
         <header>
           <h1 className="title">Frontend developer challenge</h1>
-          {this.state.isFetched ? (
-            <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
-              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(GISTS)}>
-                gist
-              </DropDown.Item>
-              <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(FOLLOWERS)}>
-                followers
-              </DropDown.Item>
-              <DropDown.Item
-                disabled={!this.state.isFetched}
-                onClick={() => this.sort(REPOSITORIES)}
-              >
-                public repos
-              </DropDown.Item>
-              <DropDown.Item
-                disabled={!this.state.isFetched}
-                onClick={() => this.sort(CONTRIBUTIONS)}
-              >
-                contributions to all Angular repositories
-              </DropDown.Item>
-            </DropDownButton>
-          ) : (
-            ''
-          )}
+          <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
+            <DropDown.Item onClick={() => this.sort(GISTS)}>gist</DropDown.Item>
+            <DropDown.Item onClick={() => this.sort(FOLLOWERS)}>followers</DropDown.Item>
+            <DropDown.Item onClick={() => this.sort(REPOSITORIES)}>public repos</DropDown.Item>
+            <DropDown.Item onClick={() => this.sort(CONTRIBUTIONS)}>
+              contributions to all Angular repositories
+            </DropDown.Item>
+          </DropDownButton>
 
           {this.state.isFiltering ? (
             <div className="inputs">
@@ -208,17 +187,9 @@ class App extends React.Component {
 
         <main>
           <div>
-            {this.state.isFetched ? (
-              <>
-                <h2 className="title"> {this.state.results.length - 1} users were found</h2>
-                <h2>{this.state.results[this.state.results.length - 1]} </h2>
-                <ul>{this.state.results}</ul>
-              </>
-            ) : this.state.isProfile ? (
-              <UserProfile handleClick={this.comeBack} url={this.state.isProfile} />
-            ) : (
-              ''
-            )}
+            <h2 className="title"> {this.state.results.length - 1} users were found</h2>
+            <h2>{this.state.results[this.state.results.length - 1]} </h2>
+            <ul>{this.state.results}</ul>
           </div>
         </main>
       </div>
@@ -227,8 +198,10 @@ class App extends React.Component {
 }
 
 const mapStateToProps = state => ({
-  contributionsWithDetails: state.contributionsWithDetails,
-  isFetched: state.isFetched
+  contributionsWithDetails: state.contributionsWithDetails
 })
 
-export default connect(mapStateToProps)(App)
+export default connect(
+  mapStateToProps,
+  { goToUserProfile }
+)(App)

@@ -39,7 +39,6 @@ ul {
   list-style-type: none;
   margin-top: 50px;
   li{
-    width: 75vw;
     padding-bottom: 20px;
     margin-bottom: 30px;
     border-bottom: 0.5px solid #e1e4e8; 
@@ -51,7 +50,6 @@ ul {
     width: auto;
   }
   li:first-child {
-    width: 75vw;
     padding-bottom: 20px;
     margin-bottom: 30px;
     border-bottom: 0.5px solid #e1e4e8; 
@@ -63,11 +61,13 @@ li{
 }
 
 h2 {
+  text-align: center;
   color: #a0b4c8;
   background-color: $background-color;
 }
 
 h3 {
+  text-align: center;
   color: #AEAEAE;
   background-color: $background-color;
 }
@@ -171,14 +171,16 @@ img {
   }
 
   .imgContainer {
-   height: 150px;
-  }
-
-  .margin{
-    margin-left: 250px;
+   height: 200px;
+   display: flex;
+   justify-content: center;
+   
   }
   
   .userContainer{
-    width: 80vw;
     overflow: hidden;
+  }
+
+  #GitPict {
+    margin: 0;
   }

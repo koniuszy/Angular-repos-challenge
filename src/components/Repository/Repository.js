@@ -1,7 +1,11 @@
 import React from 'react'
-import UserProfile from './userProfile'
+import UserProfile from '../userProfile/userProfile'
+import { TOKEN } from '../../constants'
 
-export default class Profile extends React.Component {
+import { connect } from 'react-redux'
+import { goToUserProfile, goToHomePage } from '../../redux/actions'
+
+class Profile extends React.Component {
   state = {
     repository: false,
     isRepository: true,
@@ -20,7 +24,7 @@ export default class Profile extends React.Component {
     fetch(link, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(response => response.json())
@@ -31,7 +35,7 @@ export default class Profile extends React.Component {
     fetch(`${this.state.repository.contributors_url}?per_page=100&page=${this.state.page}`, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(response => response.json())
@@ -59,7 +63,7 @@ export default class Profile extends React.Component {
       fetch(el.url, {
         method: 'GET',
         headers: {
-          Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+          Authorization: TOKEN
         }
       })
         .then(response => response.json())
@@ -86,7 +90,9 @@ export default class Profile extends React.Component {
           <h3>owner: {el.owner.login}</h3>
           <h3>{el.language}</h3>
           <h3>created at {el.created_at}</h3>
-          <h3>visit owner's profile to come back</h3>
+          <h3 className="pointer" onClick={goToHomePage}>
+            Click here to come back!
+          </h3>
         </li>
         {contributors ? this.getContributors() : <h3>Loading...</h3>}
       </ul>
@@ -107,12 +113,7 @@ export default class Profile extends React.Component {
           <h2>public gists: {el.public_gists}</h2>
           <h2>public repositories: {el.public_repos}</h2>
           <h2>followers: {el.followers}</h2>
-          <h3
-            className="pointer"
-            onClick={() => {
-              this.setState({ isRepository: false, url: el.url })
-            }}
-          >
+          <h3 className="pointer" onClick={this.props.goToUserProfile}>
             visit profile
           </h3>
         </li>
@@ -134,3 +135,12 @@ export default class Profile extends React.Component {
     return this.state.isRepository ? this.getRepository() : <UserProfile url={this.state.url} />
   }
 }
+
+const mapStateToProps = state => ({
+  url: state.RepositoryUrl
+})
+
+export default connect(
+  mapStateToProps,
+  { goToUserProfile }
+)(Profile)

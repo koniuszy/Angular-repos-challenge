@@ -1,7 +1,10 @@
 import React from 'react'
-import RepositoryProfile from './Repository'
+import RepositoryProfile from '../Repository/Repository'
+import { TOKEN } from '../../constants'
+import { connect } from 'react-redux'
+import { goToHomePage, goToRepository } from '../../redux/actions'
 
-export default class Profile extends React.Component {
+class Profile extends React.Component {
   state = {
     isUserProfile: true,
     profile: [],
@@ -18,7 +21,7 @@ export default class Profile extends React.Component {
     fetch(this.props.url, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(response => response.json())
@@ -30,7 +33,7 @@ export default class Profile extends React.Component {
     fetch(`${link}?per_page=100&page=${this.state.page}`, {
       method: 'GET',
       headers: {
-        Authorization: 'token 3874d8733d3b4ad01ee4bf67de4aea66a7735354'
+        Authorization: TOKEN
       }
     })
       .then(response => response.json())
@@ -73,7 +76,7 @@ export default class Profile extends React.Component {
             <h4
               className="pointer"
               onClick={() => {
-                this.setState({ url: el.url, isUserProfile: false })
+                this.props.goToRepository(el.url)
               }}
             >
               visit repository
@@ -119,8 +122,9 @@ export default class Profile extends React.Component {
   render() {
     return this.state.isUserProfile ? (
       <div className="userContainer">
-        <img alt="img" src={this.state.profile.avatar_url} />
-        <div className="imgContainer" />
+        <div className="imgContainer">
+          <img id="GitPict" alt="img" src={this.state.profile.avatar_url} />
+        </div>
         <h2 className="margin">Welcome to {this.state.profile.login}'s profile!</h2>
         <br />
         <br />
@@ -136,7 +140,7 @@ export default class Profile extends React.Component {
         <br />
         {this.publicRepositories()}
         <br />
-        <h3 onClick={this.props.handleClick} className="pointer">
+        <h3 onClick={this.props.goToHomePage} className="pointer">
           Click here to come back!
         </h3>
         <br />
@@ -148,3 +152,12 @@ export default class Profile extends React.Component {
     )
   }
 }
+
+const mapStateToProps = state => ({
+  url: state.userProfileUrl
+})
+
+export default connect(
+  mapStateToProps,
+  { goToHomePage, goToRepository }
+)(Profile)
