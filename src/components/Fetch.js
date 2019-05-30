@@ -150,7 +150,8 @@ class FetchAngularRepositories extends React.Component {
           <App />
         ) : (
           <>
-            <h2 style={{ textAlign: 'center', paddingTop: '50px' }}>Loading....</h2>
+            <h2 style={{ textAlign: 'center', paddingTop: '50px' }}>Loading...</h2>
+            <h3>We are fetching all Angular repositories contributors </h3>
             <h3 style={{ paddingBottom: '50px' }}>It can take up to one minute</h3>
           </>
         )}
