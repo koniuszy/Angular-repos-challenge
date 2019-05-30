@@ -2,6 +2,7 @@ import React from 'react'
 import { REPOSITORIESLINK, TOKEN } from '../constants'
 import { connect } from 'react-redux'
 import { fillContributors } from '../redux/actions'
+import App from './App'
 
 class FetchAngularRepositories extends React.Component {
   state = {
@@ -143,11 +144,27 @@ class FetchAngularRepositories extends React.Component {
   }
 
   render() {
-    return 1
+    return (
+      <>
+        {this.props.isFetched ? (
+          <App />
+        ) : (
+          <>
+            <h2 style={{ textAlign: 'center', paddingTop: '50px' }}>Loading....</h2>
+            <h3 style={{ paddingBottom: '50px' }}>It can take up to one minute</h3>
+          </>
+        )}
+      </>
+    )
   }
 }
 
+const mapStateToProps = state => ({
+  contributionsWithDetails: state.contributionsWithDetails,
+  isFetched: state.isFetched
+})
+
 export default connect(
-  null,
+  mapStateToProps,
   { fillContributors }
 )(FetchAngularRepositories)

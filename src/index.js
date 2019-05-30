@@ -1,6 +1,6 @@
 import React from 'react'
 import ReactDOM from 'react-dom'
-import App from './components/App'
+import Fetch from './components/Fetch'
 import * as serviceWorker from './serviceWorker'
 
 import store from './redux/store'
@@ -11,7 +11,7 @@ import './index.scss'
 
 ReactDOM.render(
   <Provider store={store}>
-    <App />
+    <Fetch />
   </Provider>,
   document.getElementById('root')
 )

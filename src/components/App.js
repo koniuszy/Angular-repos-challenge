@@ -10,7 +10,6 @@ import { AwesomeButton } from 'react-awesome-button'
 import { connect } from 'react-redux'
 // import { counter } from '../redux/actions'
 import { GISTS, FOLLOWERS, REPOSITORIES, CONTRIBUTIONS } from '../constants'
-import FetchRepositories from './fetch'
 
 class App extends React.Component {
   state = {
@@ -21,7 +20,9 @@ class App extends React.Component {
     inputTo: ''
   }
 
-  componentDidMount() {}
+  componentDidMount() {
+    this.newResults(this.props.contributionsWithDetails, false)
+  }
 
   newResults = (tab, filter) => {
     this.setState({ isFetched: true })
@@ -127,10 +128,6 @@ class App extends React.Component {
       <div className="container">
         <header>
           <h1 className="title">Frontend developer challenge</h1>
-          <FetchRepositories />
-          {this.props.isFetched
-            ? this.newResults(this.props.contributionsWithDetails, false)
-            : console.log(3)}
           {this.state.isFetched ? (
             <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
               <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(GISTS)}>
@@ -220,12 +217,7 @@ class App extends React.Component {
             ) : this.state.isProfile ? (
               <UserProfile handleClick={this.comeBack} url={this.state.isProfile} />
             ) : (
-              <ul>
-                <li>
-                  <h2>Loading....</h2>
-                  <h3>It can take up to one minute</h3>
-                </li>
-              </ul>
+              ''
             )}
           </div>
         </main>
