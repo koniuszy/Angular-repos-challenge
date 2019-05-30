@@ -1,18 +1,19 @@
-import { INCREMENT, DECREMENT } from '../actionTypes'
+export const CONTRIBUTORSTAB = 'CONTRIBUTORSTAB'
 
 const initialState = {
-  number: 0
+  contributionsWithDetails: [],
+  isFetched: false
 }
 
 const reducer = (state = initialState, action) => {
   switch (action.type) {
-    case INCREMENT:
+    case CONTRIBUTORSTAB:
+      console.log(action)
+      console.log(action.payload)
+      console.log(action.payload.content)
       return {
-        number: state.number + 1
-      }
-    case DECREMENT:
-      return {
-        number: state.number - 1
+        contributionsWithDetails: action.payload.content,
+        isFetched: true
       }
     default:
       return state

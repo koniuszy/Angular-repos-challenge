@@ -8,26 +8,13 @@ import DropDown from 'react-bootstrap/Dropdown'
 import _ from 'lodash'
 import { AwesomeButton } from 'react-awesome-button'
 import { connect } from 'react-redux'
-import { counter } from '../redux/actions'
-import {
-  REPOSITORIESLINK,
-  GISTS,
-  FOLLOWERS,
-  REPOSITORIES,
-  CONTRIBUTIONS,
-  TOKEN
-} from '../constants'
+// import { counter } from '../redux/actions'
+import { GISTS, FOLLOWERS, REPOSITORIES, CONTRIBUTIONS } from '../constants'
+import FetchRepositories from './fetch'
 
 class App extends React.Component {
   state = {
     isFetched: false,
-    page: 1,
-    repositories: [],
-    contributors: [],
-    contributorsLinks: [],
-    errors: 0,
-    contributorsWithoutRepeats: [],
-    contributionsWithDetails: [],
     results: [],
     isFiltering: false,
     isProfile: false,
@@ -35,134 +22,7 @@ class App extends React.Component {
     inputTo: ''
   }
 
-  componentDidMount() {
-    this.fetchRepositories()
-  }
-
-  fetchRepositories = () => {
-    fetch(REPOSITORIESLINK + this.state.page, {
-      method: 'GET',
-      headers: {
-        Authorization: TOKEN
-      }
-    })
-      .then(this.setState({ page: this.state.page + 1 }))
-      .then(response => response.json())
-      .then(data => {
-        if (data.items.length > 1) {
-          this.setState(
-            prevState => ({ repositories: [...prevState.repositories, ...data.items] }),
-            this.fetchRepositories
-          )
-        }
-        if (data.items.length < 100) {
-          let tab = []
-          this.state.repositories.map(el => {
-            tab.push(el.contributors_url)
-            return 1
-          })
-          if (this.state.contributorsLinks !== tab) {
-            this.setState({ contributorsLinks: tab }, this.fetchContributorsLinks)
-          }
-        }
-      })
-  }
-
-  fetchContributorsLinks = () => {
-    this.state.contributorsLinks.map((el, index) => {
-      fetch(el, {
-        method: 'GET',
-        headers: {
-          Authorization: TOKEN
-        }
-      })
-        .then(response => {
-          if (response.statusText === 'OK') {
-            return response.json()
-          } else {
-            return console.log(`${this.state.contributorsLinks[index]} number ${index} is valid`)
-          }
-        })
-        .then(data => {
-          if (typeof data !== 'undefined') {
-            return this.setState(
-              prevState => ({ contributors: [...prevState.contributors, data] }),
-              this.allContributors
-            )
-          } else {
-            return this.setState({ errors: this.state.errors + 1 })
-          }
-        })
-      return 1
-    })
-  }
-
-  allContributors = () => {
-    if (
-      this.state.contributorsLinks.length ===
-      this.state.contributors.length + this.state.errors
-    ) {
-      let contributorsTab = []
-      let checkID = []
-
-      this.state.contributors.map(el => {
-        el.map(element => {
-          if (checkID.includes(element.id)) {
-            let position = checkID.indexOf(element.id)
-            contributorsTab[position].repeats++
-            return 0
-          } else {
-            contributorsTab.push(element)
-            contributorsTab[contributorsTab.length - 1].repeats = 0
-            checkID.push(element.id)
-            return 1
-          }
-        })
-        return 1
-      })
-
-      contributorsTab.map(el => {
-        this.fetchUserUrl(el.url, contributorsTab.length, contributorsTab)
-        return 1
-      })
-    }
-  }
-
-  fetchUserUrl = (el, length, contributorsTab) => {
-    fetch(el, {
-      method: 'GET',
-      headers: {
-        Authorization: TOKEN
-      }
-    })
-      .then(response => response.json())
-      .then(data =>
-        this.setState(
-          prevState => ({
-            contributionsWithDetails: [...prevState.contributionsWithDetails, data]
-          }),
-          () => this.allContributorsWithDetails(length, contributorsTab)
-        )
-      )
-  }
-
-  allContributorsWithDetails = (length, contributorsTab) => {
-    if (this.state.contributionsWithDetails.length === length) {
-      let contributionsWithRepeats = this.state.contributionsWithDetails
-      contributorsTab.map((el, index) => {
-        contributionsWithRepeats[index].repeats = el.repeats
-        return 1
-      })
-
-      this.setState(
-        {
-          contributionsWithDetails: contributionsWithRepeats,
-          isFetched: true
-        },
-        () => this.newResults(this.state.contributionsWithDetails, false)
-      )
-    }
-  }
+  componentDidMount() {}
 
   newResults = (tab, filter) => {
     let filteredBy = filter
@@ -262,15 +122,13 @@ class App extends React.Component {
     })
   }
 
-  test = () => {
-    this.props.dispatch({ type: 'INCREMENT' })
-  }
-
   render() {
     return (
       <div className="container">
         <header>
           <h1 className="title">Frontend developer challenge</h1>
+          <FetchRepositories />
+          {this.props.isFetched ? console.log(2) : console.log(3)}
           {this.state.isFetched ? (
             <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
               <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(GISTS)}>
@@ -365,9 +223,6 @@ class App extends React.Component {
                   <h2>Loading....</h2>
                   <h3>It can take up to one minute</h3>
                 </li>
-                <AwesomeButton action={this.test} type="primary" size="medium">
-                  nr {this.props.number}
-                </AwesomeButton>
               </ul>
             )}
           </div>
@@ -377,4 +232,9 @@ class App extends React.Component {
   }
 }
 
-export default connect(counter)(App)
+const mapStateToProps = state => ({
+  contributionsWithDetails: state.contributionsWithDetails,
+  isFetched: state.isFetched
+})
+
+export default connect(mapStateToProps)(App)

@@ -1,3 +1,8 @@
-export const counter = state => ({
-  number: state.number
+import { CONTRIBUTORSTAB } from './reducers/counter'
+
+export const fillContributors = content => ({
+  type: CONTRIBUTORSTAB,
+  payload: {
+    content
+  }
 })

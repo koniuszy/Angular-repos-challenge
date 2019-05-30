@@ -1,0 +1,152 @@
+import React from 'react'
+import { REPOSITORIESLINK, TOKEN } from '../constants'
+import { connect } from 'react-redux'
+import { fillContributors } from '../redux/actions'
+
+class FetchAngularRepositories extends React.Component {
+  state = {
+    page: 1,
+    repositories: [],
+    contributors: [],
+    contributorsLinks: [],
+    errors: 0,
+    contributionsWithDetails: []
+  }
+  componentDidMount() {
+    this.fetchRepositories()
+  }
+
+  fetchRepositories = () => {
+    console.log('I am fetching repos')
+    fetch(REPOSITORIESLINK + this.state.page, {
+      method: 'GET',
+      headers: {
+        Authorization: TOKEN
+      }
+    })
+      .then(response => response.json())
+      .then(data => {
+        if (data.items.length > 1) {
+          this.setState(
+            prevState => ({
+              repositories: [...prevState.repositories, ...data.items],
+              page: this.state.page + 1
+            }),
+            this.fetchRepositories
+          )
+        } else if (data.items.length < 100) {
+          let tab = []
+          this.state.repositories.map(el => {
+            tab.push(el.contributors_url)
+            return 1
+          })
+          if (this.state.contributorsLinks !== tab) {
+            this.setState({ contributorsLinks: tab }, this.fetchContributorsLinks)
+          }
+        }
+      })
+  }
+
+  fetchContributorsLinks = () => {
+    this.state.contributorsLinks.map((el, index) => {
+      console.log('I am fetchingContributorsLinks')
+      fetch(el, {
+        method: 'GET',
+        headers: {
+          Authorization: TOKEN
+        }
+      })
+        .then(response => {
+          if (response.statusText === 'OK') {
+            return response.json()
+          } else {
+            return console.log(`${this.state.contributorsLinks[index]} number ${index} is valid`)
+          }
+        })
+        .then(data => {
+          if (typeof data !== 'undefined') {
+            return this.setState(
+              prevState => ({ contributors: [...prevState.contributors, data] }),
+              this.allContributors
+            )
+          } else {
+            return this.setState({ errors: this.state.errors + 1 })
+          }
+        })
+      return 1
+    })
+  }
+
+  allContributors = () => {
+    if (
+      this.state.contributorsLinks.length ===
+      this.state.contributors.length + this.state.errors
+    ) {
+      let contributorsTab = []
+      let checkID = []
+
+      this.state.contributors.map(el => {
+        el.map(element => {
+          console.log('I am pushing props about repeats')
+          if (checkID.includes(element.id)) {
+            let position = checkID.indexOf(element.id)
+            contributorsTab[position].repeats++
+            return 0
+          } else {
+            contributorsTab.push(element)
+            contributorsTab[contributorsTab.length - 1].repeats = 0
+            checkID.push(element.id)
+            return 1
+          }
+        })
+        return 1
+      })
+
+      contributorsTab.map(el => {
+        this.fetchUserUrl(el.url, contributorsTab.length, contributorsTab)
+        return 1
+      })
+    }
+  }
+
+  fetchUserUrl = (el, length, contributorsTab) => {
+    console.log('I am fetchingUserUrl ')
+    fetch(el, {
+      method: 'GET',
+      headers: {
+        Authorization: TOKEN
+      }
+    })
+      .then(response => response.json())
+      .then(data =>
+        this.setState(
+          prevState => ({
+            contributionsWithDetails: [...prevState.contributionsWithDetails, data]
+          }),
+          () => this.allContributorsWithDetails(length, contributorsTab)
+        )
+      )
+  }
+
+  allContributorsWithDetails = (length, contributorsTab) => {
+    if (this.state.contributionsWithDetails.length === length) {
+      let contributionsWithRepeats = this.state.contributionsWithDetails
+      contributorsTab.map((el, index) => {
+        console.log('I am pushing details')
+        contributionsWithRepeats[index].repeats = el.repeats
+        return 1
+      })
+      // this.newResults(this.state.contributionsWithDetails, false)
+      this.props.fillContributors(this.state.contributionsWithRepeats)
+    }
+  }
+
+  render() {
+    return 1
+  }
+}
+
+export default connect(
+  null,
+  { fillContributors }
+)(FetchAngularRepositories)
