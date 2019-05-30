@@ -17,7 +17,6 @@ class FetchAngularRepositories extends React.Component {
   }
 
   fetchRepositories = () => {
-    console.log('I am fetching repos')
     fetch(REPOSITORIESLINK + this.state.page, {
       method: 'GET',
       headers: {
@@ -26,6 +25,7 @@ class FetchAngularRepositories extends React.Component {
     })
       .then(response => response.json())
       .then(data => {
+        console.log('I am fetching repos')
         if (data.items.length > 1) {
           this.setState(
             prevState => ({
@@ -49,7 +49,6 @@ class FetchAngularRepositories extends React.Component {
 
   fetchContributorsLinks = () => {
     this.state.contributorsLinks.map((el, index) => {
-      console.log('I am fetchingContributorsLinks')
       fetch(el, {
         method: 'GET',
         headers: {
@@ -57,6 +56,7 @@ class FetchAngularRepositories extends React.Component {
         }
       })
         .then(response => {
+          console.log('I am fetchingContributorsLinks')
           if (response.statusText === 'OK') {
             return response.json()
           } else {
@@ -110,7 +110,6 @@ class FetchAngularRepositories extends React.Component {
   }
 
   fetchUserUrl = (el, length, contributorsTab) => {
-    console.log('I am fetchingUserUrl ')
     fetch(el, {
       method: 'GET',
       headers: {
@@ -118,14 +117,15 @@ class FetchAngularRepositories extends React.Component {
       }
     })
       .then(response => response.json())
-      .then(data =>
+      .then(data => {
+        console.log('I am fetchingUserUrl ')
         this.setState(
           prevState => ({
             contributionsWithDetails: [...prevState.contributionsWithDetails, data]
           }),
           () => this.allContributorsWithDetails(length, contributorsTab)
         )
-      )
+      })
   }
 
   allContributorsWithDetails = (length, contributorsTab) => {
@@ -137,7 +137,8 @@ class FetchAngularRepositories extends React.Component {
         return 1
       })
       // this.newResults(this.state.contributionsWithDetails, false)
-      this.props.fillContributors(this.state.contributionsWithRepeats)
+      console.log(contributionsWithRepeats)
+      this.props.fillContributors(contributionsWithRepeats)
     }
   }
 

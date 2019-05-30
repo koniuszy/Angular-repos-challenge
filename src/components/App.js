@@ -14,7 +14,6 @@ import FetchRepositories from './fetch'
 
 class App extends React.Component {
   state = {
-    isFetched: false,
     results: [],
     isFiltering: false,
     isProfile: false,
@@ -25,6 +24,7 @@ class App extends React.Component {
   componentDidMount() {}
 
   newResults = (tab, filter) => {
+    this.setState({ isFetched: true })
     let filteredBy = filter
     if (filter === CONTRIBUTIONS) {
       filteredBy = 'amount of contributions to all Angular repositories'
@@ -128,7 +128,9 @@ class App extends React.Component {
         <header>
           <h1 className="title">Frontend developer challenge</h1>
           <FetchRepositories />
-          {this.props.isFetched ? console.log(2) : console.log(3)}
+          {this.props.isFetched
+            ? this.newResults(this.props.contributionsWithDetails, false)
+            : console.log(3)}
           {this.state.isFetched ? (
             <DropDownButton variant="secondary" id="dropdown-basic-button" title="Filter">
               <DropDown.Item disabled={!this.state.isFetched} onClick={() => this.sort(GISTS)}>

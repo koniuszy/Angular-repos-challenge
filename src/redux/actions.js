@@ -1,8 +1,11 @@
 import { CONTRIBUTORSTAB } from './reducers/counter'
 
-export const fillContributors = content => ({
-  type: CONTRIBUTORSTAB,
-  payload: {
-    content
+export const fillContributors = content => {
+  console.log(content)
+  return {
+    type: CONTRIBUTORSTAB,
+    payload: {
+      content
+    }
   }
-})
+}
