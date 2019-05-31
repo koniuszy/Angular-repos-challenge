@@ -90,8 +90,8 @@ class Profile extends React.Component {
           <h3>owner: {el.owner.login}</h3>
           <h3>{el.language}</h3>
           <h3>created at {el.created_at}</h3>
-          <h3 className="pointer" onClick={goToHomePage}>
-            Click here to come back!
+          <h3 className="pointer" onClick={this.props.goToHomePage}>
+            Click here to go to the homePage!
           </h3>
         </li>
         {contributors ? this.getContributors() : <h3>Loading...</h3>}
@@ -142,5 +142,5 @@ const mapStateToProps = state => ({
 
 export default connect(
   mapStateToProps,
-  { goToUserProfile }
+  { goToUserProfile, goToHomePage }
 )(Profile)

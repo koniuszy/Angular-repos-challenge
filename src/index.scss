@@ -37,7 +37,6 @@ code {
 
 ul {
   list-style-type: none;
-  margin-top: 50px;
   li{
     padding-bottom: 20px;
     margin-bottom: 30px;
@@ -164,6 +163,7 @@ img {
 
   .pointer {
     cursor: pointer;
+    color: white;
   }
 
   .welcome {
@@ -171,10 +171,11 @@ img {
   }
 
   .imgContainer {
-   height: 200px;
+    margin-top: 50px;
+   height: 220px;
    display: flex;
    justify-content: center;
-   
+
   }
   
   .userContainer{

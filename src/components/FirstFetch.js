@@ -148,15 +148,16 @@ class FetchAngularRepositories extends React.Component {
   render() {
     return (
       <>
-        {this.props.isFetched ? (
-          <App />
-        ) : (
+        {this.props.isLoader ? (
           <>
             <h2 style={{ textAlign: 'center', paddingTop: '50px' }}>Loading...</h2>
             <h3>We are fetching all Angular repositories contributors </h3>
             <h3 style={{ paddingBottom: '50px' }}>It can take up to one minute</h3>
           </>
+        ) : (
+          ''
         )}
+        {this.props.isFetched ? <App /> : ''}
         {this.props.isUserProfile ? <UserProfile /> : ''}
         {this.props.isRepositoryProfile ? <Repository /> : ''}
       </>
@@ -168,7 +169,8 @@ const mapStateToProps = state => ({
   contributionsWithDetails: state.contributionsWithDetails,
   isFetched: state.isFetched,
   isUserProfile: state.isUserProfile,
-  isRepositoryProfile: state.isRepositoryProfile
+  isRepositoryProfile: state.isRepositoryProfile,
+  isLoader: state.isLoader
 })
 
 export default connect(

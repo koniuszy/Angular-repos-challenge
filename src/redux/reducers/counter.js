@@ -9,7 +9,8 @@ const initialState = {
   isUserProfile: false,
   userProfileUrl: '',
   isRepositoryProfile: false,
-  RepositoryUrl: ''
+  RepositoryUrl: '',
+  isLoader: true
 }
 
 const reducer = (state = initialState, action) => {
@@ -18,14 +19,16 @@ const reducer = (state = initialState, action) => {
       return {
         ...state,
         contributionsWithDetails: action.payload.content,
-        isFetched: true
+        isFetched: true,
+        isLoader: false
       }
     case GOTOUSERPROFILE:
       return {
         ...state,
         userProfileUrl: action.payload.url,
         isFetched: false,
-        isUserProfile: true
+        isUserProfile: true,
+        isRepositoryProfile: false
       }
     case GOHOME:
       return {

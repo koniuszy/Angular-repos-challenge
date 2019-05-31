@@ -1,5 +1,4 @@
 import React from 'react'
-import RepositoryProfile from '../Repository/Repository'
 import { TOKEN } from '../../constants'
 import { connect } from 'react-redux'
 import { goToHomePage, goToRepository } from '../../redux/actions'
@@ -120,14 +119,12 @@ class Profile extends React.Component {
   }
 
   render() {
-    return this.state.isUserProfile ? (
+    return (
       <div className="userContainer">
         <div className="imgContainer">
           <img id="GitPict" alt="img" src={this.state.profile.avatar_url} />
         </div>
         <h2 className="margin">Welcome to {this.state.profile.login}'s profile!</h2>
-        <br />
-        <br />
         <br />
         <h2>My real name is {this.realName()}.</h2>
         <br />
@@ -141,14 +138,12 @@ class Profile extends React.Component {
         {this.publicRepositories()}
         <br />
         <h3 onClick={this.props.goToHomePage} className="pointer">
-          Click here to come back!
+          Click here to go to the homePage!
         </h3>
         <br />
         <br />
         {this.getRepositories()}
       </div>
-    ) : (
-      <RepositoryProfile url={this.state.url} />
     )
   }
 }
